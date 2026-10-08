@@ -1,0 +1,9 @@
+{
+  "name": "pi-free-mode-lib",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "Free model lanes ported from dsh-our-free-model (MIT). Host-agnostic core; no DSH imports.",
+  "dependencies": {}
+}

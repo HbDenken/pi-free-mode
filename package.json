@@ -1,0 +1,12 @@
+{
+  "name": "pi-free-mode",
+  "version": "0.1.0",
+  "description": "Free model lanes for PI-Desktop: OpenCode Zen anonymous + Kilo free pool, served through a local forward port. No API key required.",
+  "license": "MIT",
+  "private": true,
+  "main": "main.js",
+  "keywords": ["pi-desktop", "plugin", "free-models", "opencode-zen", "kilo"],
+  "engines": {
+    "piDesktop": ">=0.17.0"
+  }
+}

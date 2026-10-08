@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "id": "local.pi-free-mode",
+  "name": "pi-free-mode",
+  "version": "0.1.0",
+  "description": "免密模型通道：OpenCode Zen 匿名层 + Kilo 免费池，经本地 127.0.0.1 转发接入，无需 API Key。Free lanes: OpenCode Zen anonymous + Kilo free pool via a local forward port.",
+  "author": "pi-free-mode contributors",
+  "main": "main.js",
+  "contributes": {
+    "providers": [
+      {
+        "id": "free-models",
+        "name": "pi-free-mode (free lanes)",
+        "baseUrl": "http://127.0.0.1:19401/v1",
+        "apiStyle": "chat_completions",
+        "authKind": "none",
+        "models": [
+          { "id": "mimo-v2.6-flash-free", "name": "MiMo V2.6 Flash", "contextWindow": 1048576, "maxTokens": 131072, "supportsImages": true, "thinkingLevels": ["low", "medium", "high"], "defaultThinkingLevel": "medium" },
+          { "id": "muse-spark-1.3-contributor-free", "name": "Muse Spark 1.3", "contextWindow": 1048576, "maxTokens": 131072, "supportsImages": true, "thinkingLevels": ["low", "medium", "high"], "defaultThinkingLevel": "medium" },
+          { "id": "muse-spark-1.2-contributor-free", "name": "Muse Spark 1.2", "contextWindow": 1048576, "maxTokens": 131072, "supportsImages": true, "thinkingLevels": ["low", "medium", "high"], "defaultThinkingLevel": "medium" },
+          { "id": "nemotron-3-ultra-free", "name": "Nemotron 3 Ultra", "contextWindow": 128000, "maxTokens": 32768, "supportsImages": false, "thinkingLevels": ["low", "medium", "high"], "defaultThinkingLevel": "medium" },
+          { "id": "nemotron-3.5-lightning-free", "name": "Nemotron 3.5 Lightning", "contextWindow": 128000, "maxTokens": 32768, "supportsImages": false, "thinkingLevels": ["low", "medium", "high"], "defaultThinkingLevel": "medium" },
+          { "id": "ling-3.0-flash-fin-free", "name": "Ling 3.0 Flash Fin", "contextWindow": 128000, "maxTokens": 32768, "supportsImages": false, "thinkingLevels": ["low", "medium", "high"], "defaultThinkingLevel": "medium" },
+          { "id": "ling-3.1-flash-free", "name": "Ling 3.1 Flash", "contextWindow": 128000, "maxTokens": 32768, "supportsImages": false, "thinkingLevels": ["low", "medium", "high"], "defaultThinkingLevel": "medium" },
+          { "id": "space-bunny-free", "name": "Space Bunny", "contextWindow": 262144, "maxTokens": 65536, "supportsImages": true, "thinkingLevels": ["low", "medium", "high"], "defaultThinkingLevel": "medium" },
+          { "id": "jev-1.13-free", "name": "Jev 1.13", "contextWindow": 32768, "maxTokens": 4096, "supportsImages": false },
+          { "id": "exo-free", "name": "Exo (free)" },
+          { "id": "fledge-alpha-free", "name": "Fledge Alpha (free)" },
+          { "id": "longcat-2.5-preview-free", "name": "LongCat 2.5 Preview (free)" },
+          { "id": "kilo-auto/free", "name": "Kilo Auto Free", "contextWindow": 256000, "maxTokens": 32768, "supportsImages": false, "thinkingLevels": ["low", "medium", "high"], "defaultThinkingLevel": "medium" },
+          { "id": "inclusionai/ling-3.1-flash", "name": "Ling 3.1 Flash (Kilo)", "contextWindow": 262144, "maxTokens": 32768, "supportsImages": false, "thinkingLevels": ["low", "medium", "high"], "defaultThinkingLevel": "medium" },
+          { "id": "nvidia/nemotron-3-ultra-550b-a55b:free", "name": "Nemotron 3 Ultra 550B (free)", "contextWindow": 1000000, "maxTokens": 65536, "supportsImages": false, "thinkingLevels": ["low", "medium", "high"], "defaultThinkingLevel": "medium" },
+          { "id": "dots-studio/dots-3-note-preview:free", "name": "DOTS 3 Note Preview (free)", "contextWindow": 512000, "maxTokens": 460800, "supportsImages": false, "thinkingLevels": ["low", "medium", "high"], "defaultThinkingLevel": "medium" },
+          { "id": "poolside/laguna-s-2.1:free", "name": "Laguna S 2.1 (free)", "contextWindow": 262144, "maxTokens": 32768, "supportsImages": false, "thinkingLevels": ["low", "medium", "high"], "defaultThinkingLevel": "medium" },
+          { "id": "inclusionai/ling-3.0-flash-sante:free", "name": "Ling 3.0 Flash Sante (free)", "contextWindow": 262144, "maxTokens": 32768, "supportsImages": false, "thinkingLevels": ["low", "medium", "high"], "defaultThinkingLevel": "medium" },
+          { "id": "liquid/lfm-2.5-2.6b:free", "name": "LFM 2.5 2.6B (free)", "contextWindow": 65536, "maxTokens": 8192, "supportsImages": false }
+        ]
+      }
+    ],
+    "services": [
+      { "id": "pifree-forward", "label": "pi-free-mode forward server (127.0.0.1:19401)" }
+    ]
+  },
+  "permissions": ["provider.register", "background.service"],
+  "engines": { "piDesktop": ">=0.17.0" },
+  "activationEvents": ["onStartup"]
+}
