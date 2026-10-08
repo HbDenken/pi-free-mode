@@ -126,6 +126,8 @@ jev / exo / fledge / longcat / liquid 五系不带。**无需 Key，选中即聊
   脱离 PI-Desktop 的全链路验证用 `node scripts/smoke.mjs`。
 - 某模型报 502/失败 = 该免费 lane 上游临时不可用，换一个模型即可
   （转发器按 lane 降级），或重启插件刷新目录。
+  先跑 `node scripts/health.mjs` 看当前哪些 lane 活着
+  （REG = 需非中国出口；GONE/?? = 上游下线，稍后重试）。
 - 若宿主版本尚未实现 `contributes.providers`（模型行不出现），兜底：
   设置里手动添加自定义 OpenAI 兼容源，`baseUrl = http://127.0.0.1:19401/v1`，
   不填 Key —— 照样可用（上游直连用的是插件进程原生 `fetch`，
