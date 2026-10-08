@@ -86,6 +86,87 @@ try {
   } else {
     check('kilo stream skipped (pool empty at boot)', false)
   }
+
+  // 7. Tool-call round-trip (issue #20's seam). The free tier's gate makes the
+  // plugin declare the bash/glob/grep/read quartet even when the caller has no
+  // such tools, so the wire owes the caller two things: tool_calls renumbered
+  // from 0 (upstream indices are shared with reasoning/text blocks), and the
+  // caller's own tool spelling back (a `pwsh` slot filled as `bash` upstream
+  // must come back as `pwsh`). Asserted as invariants on whatever the model
+  // returns — a model that answers in prose instead of calling is a pass here,
+  // since that is model behaviour, not the forwarder's contract.
+  const declared = ['pwsh', 'get_time']
+  const toolRes = await fetch(`http://127.0.0.1:${port}/v1/chat/completions`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      model: 'mimo-v2.6-flash-free',
+      messages: [{ role: 'user', content: '立刻调用 pwsh 工具的 run_command 命令执行 echo hi。不要直接回答，必须先调用工具。' }],
+      max_tokens: 4096,
+      stream: true,
+      tools: declared.map(name => ({
+        type: 'function',
+        function: {
+          name,
+          description: name === 'pwsh' ? 'Run a shell command.' : 'Get the current time.',
+          parameters: { type: 'object', properties: { command: { type: 'string' } } },
+        },
+      })),
+    }),
+  })
+  check('tool-call stream HTTP 200', toolRes.status === 200, `HTTP ${toolRes.status}`)
+  const toolEvents = (await toolRes.text())
+    .split('\n\n')
+    .filter(block => block.includes('data:'))
+    .map(block => block.split('data: ').pop())
+    .filter(payload => payload && payload !== '[DONE]')
+    .map(payload => { try { return JSON.parse(payload) } catch { return null } })
+    .filter(Boolean)
+  const calls = new Map()
+  let sawSparseIndex = false
+  for (const event of toolEvents) {
+    for (const delta of event.choices?.[0]?.delta?.tool_calls ?? []) {
+      if (typeof delta.index === 'number' && delta.index > calls.size) sawSparseIndex = true
+      const key = delta.id ?? delta.index ?? calls.size
+      if (!calls.has(key)) calls.set(key, { index: delta.index, name: '', args: '' })
+      const call = calls.get(key)
+      if (delta.function?.name) call.name = delta.function.name
+      if (delta.function?.arguments) call.args += delta.function.arguments
+    }
+  }
+  const assembled = [...calls.values()].filter(call => call.name !== '')
+  check('tool_calls reindexed from 0', !sawSparseIndex, assembled.map(call => `${call.name}(${call.args.slice(0, 40)})`).join(' ') || 'model answered in prose')
+  const leakedDecoy = assembled.filter(call => !declared.includes(call.name))
+  check('no undeclared/decoy tool leaked', leakedDecoy.length === 0, leakedDecoy.map(call => call.name).join(','))
+  const badArgs = assembled.filter(call => {
+    if (call.args === '') return false
+    try { JSON.parse(call.args); return false } catch { return true }
+  })
+  check('tool arguments valid JSON', badArgs.length === 0, badArgs.map(call => `${call.name}:${call.args.slice(0, 40)}`).join(' '))
+
+  // 8. Client abort mid-stream must not leak the upstream connection or hang
+  // the listener: cancel the body, then prove the same listener still serves.
+  const abortController = new AbortController()
+  const abortRes = await fetch(`http://127.0.0.1:${port}/v1/chat/completions`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      model: 'mimo-v2.6-flash-free',
+      messages: [{ role: 'user', content: '写一篇 2000 字的说明文，主题：自由软件的历史。' }],
+      max_tokens: 4096,
+      stream: true,
+    }),
+    signal: abortController.signal,
+  }).catch(() => null)
+  if (abortRes?.ok) {
+    const reader = abortRes.body.getReader()
+    await reader.read()
+    await reader.cancel().catch(() => {})
+  }
+  abortController.abort()
+  await new Promise(resolve => setTimeout(resolve, 1500))
+  const afterAbort = await fetch(`http://127.0.0.1:${port}/health`).then(r => r.json()).catch(() => null)
+  check('listener survives client abort', afterAbort?.ok === true, JSON.stringify(afterAbort))
 } catch (error) {
   check('smoke run', false, `${error?.message ?? error}`)
   console.error(error?.stack ?? '')

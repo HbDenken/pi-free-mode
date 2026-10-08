@@ -113,9 +113,12 @@ PI-Desktop 没有安装 CLI / 深链，自动化部署可直接写它的插件�
 
 ## 使用
 
-装好后模型选择器中出现 **pi-free-mode (free lanes)**，19 个模型可直接选：
+装好后模型选择器中出现 **pi-free-mode (free lanes)**，可直接选：
 mimo / muse / nemotron / ling / space-bunny 五系带思考档位，
 jev / exo / fledge / longcat / liquid 五系不带。**无需 Key，选中即聊。**
+
+> manifest 里的 19 行是**静态展示清单**；运行时目录（`/v1/models`）以启动时
+> 拉到的实时列表为准，当前约 28 个。上游增删模型重启即生效，无需改 manifest。
 
 - 转发器随插件启停；`plugin.log` 搜 `[pi-free-mode]` 应看到
   `forward listening on http://127.0.0.1:19401/v1`。

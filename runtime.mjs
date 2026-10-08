@@ -101,13 +101,11 @@ const state = () => ({
 /**
  * The one adapter instance. `resolveImage` reports "unresolvable" so image
  * parts are dropped with a warning (documented OFM behavior) rather than
- * crashing; `sealedCredential` is the EAC lane's and is never consulted for
- * Zen/Kilo entries; usage/turn recording was the dashboard's, so no-ops.
+ * crashing; usage/turn recording was the dashboard's, so no-ops.
  */
 const adapter = new FreeModelAdapter({
   state,
   resolveImage: () => undefined,
-  sealedCredential: () => undefined,
   recordUsage: () => {},
   recordTurn: () => {},
   warn: message => console.warn(`[pi-free-mode] ${message}`),
