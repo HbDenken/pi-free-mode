@@ -27,6 +27,8 @@
           { "id": "exo-free", "name": "Exo (free)" },
           { "id": "fledge-alpha-free", "name": "Fledge Alpha (free)" },
           { "id": "longcat-2.5-preview-free", "name": "LongCat 2.5 Preview (free)" },
+          { "id": "big-pickle", "name": "Big Pickle" },
+          { "id": "step-5-preview-free", "name": "Step 5 Preview (free)" },
           { "id": "kilo-auto/free", "name": "Kilo Auto Free", "contextWindow": 256000, "maxTokens": 32768, "supportsImages": false, "thinkingLevels": ["low", "medium", "high"], "defaultThinkingLevel": "medium" },
           { "id": "inclusionai/ling-3.1-flash", "name": "Ling 3.1 Flash (Kilo)", "contextWindow": 262144, "maxTokens": 32768, "supportsImages": false, "thinkingLevels": ["low", "medium", "high"], "defaultThinkingLevel": "medium" },
           { "id": "nvidia/nemotron-3-ultra-550b-a55b:free", "name": "Nemotron 3 Ultra 550B (free)", "contextWindow": 1000000, "maxTokens": 65536, "supportsImages": false, "thinkingLevels": ["low", "medium", "high"], "defaultThinkingLevel": "medium" },
