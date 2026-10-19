@@ -15,35 +15,63 @@
         "apiStyle": "chat_completions",
         "authKind": "none",
         "models": [
-          { "id": "mimo-v2.6-flash-free", "name": "MiMo V2.6 Flash", "contextWindow": 1048576, "maxTokens": 131072, "supportsImages": true, "thinkingLevels": ["low", "medium", "high"], "defaultThinkingLevel": "medium" },
-          { "id": "muse-spark-1.3-contributor-free", "name": "Muse Spark 1.3", "contextWindow": 1048576, "maxTokens": 131072, "supportsImages": true, "thinkingLevels": ["low", "medium", "high"], "defaultThinkingLevel": "medium" },
-          { "id": "muse-spark-1.2-contributor-free", "name": "Muse Spark 1.2", "contextWindow": 1048576, "maxTokens": 131072, "supportsImages": true, "thinkingLevels": ["low", "medium", "high"], "defaultThinkingLevel": "medium" },
-          { "id": "nemotron-3-ultra-free", "name": "Nemotron 3 Ultra", "contextWindow": 128000, "maxTokens": 32768, "supportsImages": false, "thinkingLevels": ["low", "medium", "high"], "defaultThinkingLevel": "medium" },
-          { "id": "nemotron-3.5-lightning-free", "name": "Nemotron 3.5 Lightning", "contextWindow": 128000, "maxTokens": 32768, "supportsImages": false, "thinkingLevels": ["low", "medium", "high"], "defaultThinkingLevel": "medium" },
-          { "id": "ling-3.0-flash-fin-free", "name": "Ling 3.0 Flash Fin", "contextWindow": 128000, "maxTokens": 32768, "supportsImages": false, "thinkingLevels": ["low", "medium", "high"], "defaultThinkingLevel": "medium" },
-          { "id": "ling-3.1-flash-free", "name": "Ling 3.1 Flash", "contextWindow": 128000, "maxTokens": 32768, "supportsImages": false, "thinkingLevels": ["low", "medium", "high"], "defaultThinkingLevel": "medium" },
-          { "id": "space-bunny-free", "name": "Space Bunny", "contextWindow": 262144, "maxTokens": 65536, "supportsImages": true, "thinkingLevels": ["low", "medium", "high"], "defaultThinkingLevel": "medium" },
-          { "id": "jev-1.13-free", "name": "Jev 1.13", "contextWindow": 32768, "maxTokens": 4096, "supportsImages": false },
-          { "id": "exo-free", "name": "Exo (free)" },
-          { "id": "fledge-alpha-free", "name": "Fledge Alpha (free)" },
-          { "id": "longcat-2.5-preview-free", "name": "LongCat 2.5 Preview (free)" },
           { "id": "big-pickle", "name": "Big Pickle" },
-          { "id": "step-5-preview-free", "name": "Step 5 Preview (free)" },
-          { "id": "kilo-auto/free", "name": "Kilo Auto Free", "contextWindow": 256000, "maxTokens": 32768, "supportsImages": false, "thinkingLevels": ["low", "medium", "high"], "defaultThinkingLevel": "medium" },
-          { "id": "inclusionai/ling-3.1-flash", "name": "Ling 3.1 Flash (Kilo)", "contextWindow": 262144, "maxTokens": 32768, "supportsImages": false, "thinkingLevels": ["low", "medium", "high"], "defaultThinkingLevel": "medium" },
-          { "id": "nvidia/nemotron-3-ultra-550b-a55b:free", "name": "Nemotron 3 Ultra 550B (free)", "contextWindow": 1000000, "maxTokens": 65536, "supportsImages": false, "thinkingLevels": ["low", "medium", "high"], "defaultThinkingLevel": "medium" },
-          { "id": "dots-studio/dots-3-note-preview:free", "name": "DOTS 3 Note Preview (free)", "contextWindow": 512000, "maxTokens": 460800, "supportsImages": false, "thinkingLevels": ["low", "medium", "high"], "defaultThinkingLevel": "medium" },
-          { "id": "poolside/laguna-s-2.1:free", "name": "Laguna S 2.1 (free)", "contextWindow": 262144, "maxTokens": 32768, "supportsImages": false, "thinkingLevels": ["low", "medium", "high"], "defaultThinkingLevel": "medium" },
-          { "id": "inclusionai/ling-3.0-flash-sante:free", "name": "Ling 3.0 Flash Sante (free)", "contextWindow": 262144, "maxTokens": 32768, "supportsImages": false, "thinkingLevels": ["low", "medium", "high"], "defaultThinkingLevel": "medium" },
-          { "id": "liquid/lfm-2.5-2.6b:free", "name": "LFM 2.5 2.6B (free)", "contextWindow": 65536, "maxTokens": 8192, "supportsImages": false }
+          { "id": "beam-free", "name": "Beam Free", "contextWindow": 131072, "maxTokens": 32768, "supportsImages": false },
+          { "id": "mimo-v2.6-flash-free", "name": "MiMo V2.6 Flash", "contextWindow": 1048576, "maxTokens": 131072, "supportsImages": true, "thinkingLevels": ["low","medium","high"], "defaultThinkingLevel": "medium" },
+          { "id": "nemotron-3.5-super-vl-free", "name": "Nemotron 3 5 Super Vl Free", "contextWindow": 128000, "maxTokens": 32768, "supportsImages": false },
+          { "id": "nemotron-3.5-lightning-free", "name": "Nemotron 3.5 Lightning", "contextWindow": 128000, "maxTokens": 32768, "supportsImages": false, "thinkingLevels": ["low","medium","high"], "defaultThinkingLevel": "medium" },
+          { "id": "jev-1.13-free", "name": "Jev 1.13", "contextWindow": 32768, "maxTokens": 4096, "supportsImages": false },
+          { "id": "longcat-2.5-preview-free", "name": "LongCat 2.5 Preview (free)" },
+          { "id": "deepseek-v4.1-flash-free", "name": "DeepSeek V4.1 Flash", "contextWindow": 128000, "maxTokens": 32768, "supportsImages": false, "thinkingLevels": ["low","medium","high"], "defaultThinkingLevel": "medium" },
+          { "id": "glm-5.3-flash-free", "name": "GLM 5.3 Flash", "contextWindow": 131072, "maxTokens": 32768, "supportsImages": false, "thinkingLevels": ["low","medium","high"], "defaultThinkingLevel": "medium" },
+          { "id": "space-bunny-free", "name": "Space Bunny", "contextWindow": 262144, "maxTokens": 65536, "supportsImages": true, "thinkingLevels": ["low","medium","high"], "defaultThinkingLevel": "medium" },
+          { "id": "kilo-auto/free", "name": "Kilo Auto Free", "contextWindow": 256000, "maxTokens": 32768, "supportsImages": false, "thinkingLevels": ["low","medium","high"], "defaultThinkingLevel": "medium" },
+          { "id": "nvidia/nemotron-3.5-super-vl:free", "name": "Kilo Nemotron 3.5 Super VL", "contextWindow": 1000000, "maxTokens": 131072, "supportsImages": true },
+          { "id": "reflection/beam-free", "name": "Kilo Beam 1.0", "contextWindow": 1048576, "maxTokens": 131072, "supportsImages": false },
+          { "id": "stealth/glyph-cluster", "name": "Kilo Glyph Cluster", "contextWindow": 256000, "maxTokens": 256000, "supportsImages": false },
+          { "id": "xingchen-agi/xing4.0-29b-a4b:free", "name": "Kilo Xing4.0 29B A4B", "contextWindow": 262144, "maxTokens": 235929, "supportsImages": false },
+          { "id": "dots-studio/dots-3-note-preview:free", "name": "DOTS 3 Note Preview (free)", "contextWindow": 512000, "maxTokens": 460800, "supportsImages": false, "thinkingLevels": ["low","medium","high"], "defaultThinkingLevel": "medium" },
+          { "id": "liquid/lfm-2.5-2.6b:free", "name": "LFM 2.5 2.6B (free)", "contextWindow": 65536, "maxTokens": 8192, "supportsImages": false },
+          { "id": "nvidia/nemotron-3.5-lightning:free", "name": "Kilo Nemotron 3.5 Lightning", "contextWindow": 1000000, "maxTokens": 65536, "supportsImages": false },
+          { "id": "thinkingmachines/inkling-small:free", "name": "Kilo Inkling Small", "contextWindow": 1048576, "maxTokens": 262144, "supportsImages": true },
+          { "id": "poolside/laguna-s-2.1:free", "name": "Laguna S 2.1 (free)", "contextWindow": 262144, "maxTokens": 32768, "supportsImages": false, "thinkingLevels": ["low","medium","high"], "defaultThinkingLevel": "medium" },
+          { "id": "poolside/laguna-xs-2.1:free", "name": "Kilo Laguna XS 2.1", "contextWindow": 262144, "maxTokens": 32768, "supportsImages": false },
+          { "id": "cohere/north-mini-code:free", "name": "Kilo North Mini Code", "contextWindow": 256000, "maxTokens": 64000, "supportsImages": false },
+          { "id": "nvidia/nemotron-3-ultra-550b-a55b:free", "name": "Nemotron 3 Ultra 550B (free)", "contextWindow": 1000000, "maxTokens": 65536, "supportsImages": false, "thinkingLevels": ["low","medium","high"], "defaultThinkingLevel": "medium" },
+          { "id": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free", "name": "Kilo Nemotron 3 Nano Omni", "contextWindow": 256000, "maxTokens": 65536, "supportsImages": true },
+          { "id": "nvidia/nemotron-3-super-120b-a12b:free", "name": "Kilo Nemotron 3 Super", "contextWindow": 262144, "maxTokens": 235929, "supportsImages": false },
+          { "id": "muse-spark-1.3-contributor-free", "name": "Muse Spark 1.3", "contextWindow": 1048576, "maxTokens": 131072, "supportsImages": true, "thinkingLevels": ["low","medium","high"], "defaultThinkingLevel": "medium" },
+          { "id": "muse-spark-1.2-contributor-free", "name": "Muse Spark 1.2", "contextWindow": 1048576, "maxTokens": 131072, "supportsImages": true, "thinkingLevels": ["low","medium","high"], "defaultThinkingLevel": "medium" }
         ]
       }
     ],
     "services": [
-      { "id": "pifree-forward", "label": "pi-free-mode forward server (127.0.0.1:19401)" }
+      {
+        "id": "pifree-forward",
+        "label": "pi-free-mode forward server (127.0.0.1:19401)"
+      }
+    ],
+    "commands": [
+      {
+        "id": "pi-free-mode.refresh-catalog",
+        "title": "pi-free-mode: Refresh model catalog",
+        "keywords": [
+          "pi-free-mode",
+          "refresh",
+          "models",
+          "catalog"
+        ]
+      }
     ]
   },
-  "permissions": ["provider.register", "background.service"],
-  "engines": { "piDesktop": ">=0.17.0" },
-  "activationEvents": ["onStartup"]
+  "permissions": [
+    "provider.register",
+    "background.service"
+  ],
+  "engines": {
+    "piDesktop": ">=0.17.0"
+  },
+  "activationEvents": [
+    "onStartup"
+  ]
 }

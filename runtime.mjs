@@ -36,23 +36,35 @@ const FORWARD_PORT = 19401
 
 /**
  * Offline roster, used when the Zen listing cannot be fetched. Verified
- * against https://opencode.ai/zen/v1/models (2026-10): the free suffix ids
- * that answer without a key.
+ * against https://opencode.ai/zen/v1/models (2026-10-16): the free suffix ids
+ * that answer without a key. Dead/deprecated ids (nemotron-3-ultra-free,
+ * ling-3.0-flash-fin-free, ling-3.1-flash-free, exo-free, fledge-alpha-free)
+ * are intentionally excluded so offline failures do not surface dead rows.
  */
 const ZEN_FALLBACK_IDS = [
   'mimo-v2.6-flash-free',
   'muse-spark-1.3-contributor-free',
   'muse-spark-1.2-contributor-free',
-  'nemotron-3-ultra-free',
   'nemotron-3.5-lightning-free',
-  'ling-3.0-flash-fin-free',
-  'ling-3.1-flash-free',
   'space-bunny-free',
   'jev-1.13-free',
-  'exo-free',
-  'fledge-alpha-free',
   'longcat-2.5-preview-free',
 ]
+
+/**
+ * Live free models deliberately kept out of the picker. The forward port still
+ * serves them and they answer fine, but they are not conversational models, so
+ * a picker row would only mislead: a safety classifier replies with a verdict
+ * rather than a chat turn, and a router forwards to a target you never chose.
+ *
+ * Both scripts/sync-manifest.mjs and the startup drift check honour this set,
+ * so excluding a model here is the only place needed — it will not come back
+ * as undeclared drift on every boot.
+ */
+export const NON_CHAT_MODEL_IDS = new Set([
+  'nvidia/nemotron-3.5-content-safety:free',
+  'openrouter/free',
+])
 
 // ── state ────────────────────────────────────────────────────────────────────
 // Immutable-snapshot model: every adapter call binds to what `state()` returns
@@ -153,6 +165,58 @@ async function bootCatalog(log) {
   }
   mergeCatalogs()
   log(`catalog ready: ${zenCatalog.length} Zen + ${kiloCatalog.length} Kilo = ${catalog.length} models`)
+  await logManifestDrift(log)
+}
+
+/**
+ * Startup drift warning: the host composer renders ONLY the rows declared in
+ * `contributes.providers[].models` (they become `config_json.models` at the
+ * host-core reconcile), so a live model that is not declared there is invisible
+ * in the picker however often the catalog refreshes. Fail-safe: any read/parse
+ * problem returns silently and never breaks boot.
+ */
+async function logManifestDrift(log) {
+  const drift = await manifestDrift()
+  if (!drift) return
+  const list = ids => {
+    const head = ids.slice(0, 6).join(', ')
+    return ids.length > 6 ? `${head} …(+${ids.length - 6} more)` : head
+  }
+  if (drift.dead.length > 0) {
+    log(`manifest drift: ${drift.dead.length} declared row(s) missing from the live listing (region-gated on this egress, or delisted): ${list(drift.dead)}`)
+  }
+  if (drift.invisible.length > 0) {
+    log(`manifest drift: ${drift.invisible.length} live model(s) not declared (hidden in the composer): ${list(drift.invisible)} — run scripts/sync-manifest.mjs --write, then restart PI-Desktop`)
+  }
+}
+
+/** Compare the static manifest roster against the live catalog. Null = unreadable. */
+async function manifestDrift() {
+  let raw
+  try {
+    const { readFile } = await import('node:fs/promises')
+    raw = await readFile(new URL('./manifest.json', import.meta.url), 'utf8')
+  } catch {
+    return null
+  }
+  try {
+    const manifest = JSON.parse(raw)
+    const declared = (manifest?.contributes?.providers ?? [])
+      .flatMap(provider => provider?.models ?? [])
+      .map(row => row?.id)
+      .filter(Boolean)
+    const declaredSet = new Set(declared)
+    const liveSet = new Set(catalog.map(entry => entry.id))
+    return {
+      declared,
+      dead: declared.filter(id => !liveSet.has(id)),
+      invisible: catalog.map(entry => entry.id)
+        .filter(id => !declaredSet.has(id))
+        .filter(id => !NON_CHAT_MODEL_IDS.has(id)),
+    }
+  } catch {
+    return null
+  }
 }
 
 // ── request helpers (ported from OFM index.js) ───────────────────────────────
@@ -343,6 +407,17 @@ export async function stop() {
   }
 }
 
+/**
+ * Re-fetch the Zen and Kilo listings without restarting the process.
+ * Safe to call from a host command, UI action, or after an upstream change.
+ * Re-merges into the live `catalog` reference so the running forward server
+ * and adapter instantly route the new model set.
+ */
+export async function refreshCatalog(log = message => console.log(`[pi-free-mode] ${message}`)) {
+  await bootCatalog(log)
+  return status()
+}
+
 /** Small status surface for smoke tests and the README's troubleshooting. */
 export function status() {
   return {
@@ -354,4 +429,23 @@ export function status() {
     zen: zenCatalog.length,
     kilo: kiloCatalog.length,
   }
+}
+
+/**
+ * Live catalog as manifest-shaped rows (id + name + contextWindow) — the
+ * picker roster, i.e. the live catalog minus NON_CHAT_MODEL_IDS. Read by
+ * scripts/sync-manifest.mjs, whose diff against the manifest is exactly the set
+ * of conversational models that exist upstream but stay invisible until synced.
+ */
+export function catalogRows() {
+  return catalog
+    .filter(entry => !NON_CHAT_MODEL_IDS.has(entry.id))
+    .map(entry => ({
+      id: entry.id,
+      name: entry.name,
+      contextWindow: entry.contextWindow ?? null,
+      maxTokens: entry.maxOutput ?? null,
+      supportsImages: entry.vision === true,
+      channel: entry.channel ?? 'zen',
+    }))
 }

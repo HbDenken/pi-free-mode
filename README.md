@@ -1,7 +1,8 @@
 # pi-free-mode
 
-PI-Desktop 免密模型插件：把 **OpenCode Zen 匿名层**（12 个 `-free` 模型）和
-**Kilo 免费网关**（16 个免费模型）接进 PI-Desktop，无需 API Key。
+PI-Desktop 免密模型插件：把 **OpenCode Zen 匿名层**（`-free` 模型）和
+**Kilo 免费网关**（免费模型）接进 PI-Desktop，无需 API Key。
+数量随上游增减，以 `/v1/models` 实时返回为准。
 
 移植自 [dsh-our-free-model](https://github.com/Ebony-Vinyl/dsh-our-free-model)（MIT），
 剥离了 DSH 宿主耦合，只保留模型通道核心。
@@ -34,11 +35,13 @@ main.js (CJS) ── import ──► runtime.mjs（宿主接线：目录、转�
 
 | 文件 | 说明 |
 |---|---|
-| `manifest.json` | schemaVersion 1；`providers`（19 个静态模型行）+ `services` + `provider.register`/`background.service` 权限 |
-| `main.js` | CJS 入口 `onLoad`/`onUnload`；注册宿主服务并直接启动（幂等） |
-| `runtime.mjs` | 宿主接线：目录启动、`computeMembership`、`runForwarded`、转发服务生命周期 |
+| `manifest.json` | schemaVersion 1；`providers`（静态模型行，由 sync 脚本维护）+ `services` + `commands` + `provider.register`/`background.service` 权限 |
+| `main.js` | CJS 入口 `onLoad`/`onUnload`；注册宿主服务、刷新命令并直接启动（幂等） |
+| `runtime.mjs` | 宿主接线：目录启动、`computeMembership`、`runForwarded`、转发服务生命周期、启动漂移告警 |
 | `lib/` | OFM `src/` 原样拷贝（26 文件），唯一补丁：`forward.js` 空 key 放行回环调用 |
 | `scripts/smoke.mjs` | 端到端冒烟（不依赖 PI-Desktop） |
+| `scripts/health.mjs` | 出口探测：哪些免费 lane 当前可用 |
+| `scripts/sync-manifest.mjs` | 对齐 manifest 模型清单与实时目录（dry-run / --write / --write --prune） |
 | `LICENSE` / `LICENSE.upstream` | 本项目 MIT + 上游 MIT 原文 |
 
 ## 验证（已通过）
@@ -117,16 +120,39 @@ PI-Desktop 没有安装 CLI / 深链，自动化部署可直接写它的插件�
 mimo / muse / nemotron / ling / space-bunny / big-pickle / step 五系带思考档位，
 jev / exo / fledge / longcat / liquid 五系不带。**无需 Key，选中即聊。**
 
-> manifest 里的 21 行是**静态展示清单**；运行时目录（`/v1/models`）以启动时
-> 拉到的实时列表为准（当前 29 个：13 Zen + 16 Kilo）。上游增删模型重启即生效，
-> 无需改 manifest。
+> **两份模型清单，刷新行为不同（这是最容易踩的坑）：**
+>
+> | 清单 | 谁在读 | 上游增删后如何生效 |
+> |---|---|---|
+> | 运行时目录（`/v1/models`，宿主 `models` 发现表） | 转发器、宿主能力探测 | 命令 `pi-free-mode: Refresh model catalog` 重拉即可，**无需重启** |
+> | `manifest.contributes.providers[].models` | 宿主启动时 reconcile → `config_json.models` | **只改 manifest 没用**：改完必须**彻底退出并重开 PI-Desktop** |
+>
+> **模型选择器（下拉框）只渲染 manifest 那份。** 运行时目录只给已声明的
+> id 补充标签/上下文，**未进 manifest 的新模型无论怎么刷新都不会出现**。
+> 所以上游新增免费模型后，要让它出现在下拉框，只需：
+>
+> ```bash
+> node scripts/sync-manifest.mjs            # 先 dry-run 看差异
+> node scripts/sync-manifest.mjs --write    # 写入 manifest（留 .bak）
+> # 然后彻底退出 PI-Desktop 再启动（热重载不重跑 reconcile）
+> ```
+>
+> 插件启动时也会自检：若实时目录与 manifest 不一致，`plugin.log` 会打
+> `manifest drift: …`，并提示用 sync 脚本对齐。
+>
+> **非对话模型不进下拉框。** 上游免费池里有两个 id 会应答但放进去只会误导：
+> `nvidia/nemotron-3.5-content-safety:free`（内容安全分类器，回的是判定不是
+> 对话）和 `openrouter/free`(路由器，会转发到你没选的模型)。它们列在
+> `runtime.mjs` 的 `NON_CHAT_MODEL_IDS`，sync 脚本和启动自检都读这一份名单——
+> 想排除别的模型改这里一处即可，不会每次启动又被报成「漏声明」。
 
 - 转发器随插件启停；`plugin.log` 搜 `[pi-free-mode]` 应看到
   `forward listening on http://127.0.0.1:19401/v1`。
-- 快速自检：`curl http://127.0.0.1:19401/v1/models` 返回 28 个模型；
-  脱离 PI-Desktop 的全链路验证用 `node scripts/smoke.mjs`。
+- 快速自检：`curl http://127.0.0.1:19401/v1/models` 返回实时模型列表（数量以
+  上游为准，见上面那份清单表）；脱离 PI-Desktop 的全链路验证用
+  `node scripts/smoke.mjs`。
 - 某模型报 502/失败 = 该免费 lane 上游临时不可用，换一个模型即可
-  （转发器按 lane 降级），或重启插件刷新目录。
+  （转发器按 lane 降级），或通过宿主命令面板运行 `pi-free-mode: Refresh model catalog` 刷新。
   先跑 `node scripts/health.mjs` 看当前哪些 lane 活着
   （REG = 需非中国出口；GONE/?? = 上游下线，稍后重试）。
 - 若宿主版本尚未实现 `contributes.providers`（模型行不出现），兜底：
@@ -165,7 +191,11 @@ jev / exo / fledge / longcat / liquid 五系不带。**无需 Key，选中即聊
 
 ## 限制（v1 刻意从简）
 
-- 模型名单启动时拉取一次，上游增删需重启插件生效（或先手动改 manifest 静态行）。
+- 模型名单启动时拉取一次（`bootCatalog`）；宿主命令
+  `pi-free-mode: Refresh model catalog` 只刷新**运行时目录**（`/v1/models`），
+  无需重启插件。**但它不会改模型选择器**——下拉框渲染的是 manifest 那份，
+  上游新增模型必须跑 `node scripts/sync-manifest.mjs --write` 并**彻底重启
+  PI-Desktop**（见上「两份模型清单」）。
 - 图片不透传（`resolveImage` 返回不可解析 → 按 OFM 语义丢弃并告警）。
 - 区域通道、探测、LAN 中继、EAC/桌面登录、更新器、看板均未移植。
 - 设置为进程内存态（默认值），无持久化 UI。

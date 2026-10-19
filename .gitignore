@@ -2,3 +2,6 @@ node_modules/
 dist/
 *.piplug
 smoke-out/
+
+# Left behind by scripts/sync-manifest.mjs --write
+manifest.json.bak
